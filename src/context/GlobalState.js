@@ -1,15 +1,20 @@
-import React, { Children, createContext, useReducer, usereducer } from 'react';
+import React, { createContext, useReducer, useEffect } from 'react';
 import AppReducer from './AppReducer';
+
+// Load transactions from localStorage (if any)
+function loadInitialTransactions() {
+  try {
+    const stored = localStorage.getItem('transactions');
+    return stored ? JSON.parse(stored) : [];
+  } catch (err) {
+    return [];
+  }
+}
 
 // Initial state
 const initialState = {
-  transactions: [
-       { id: 1, text: 'Flower', amount:-220},
-       { id: 2, text: 'Salary', amount:30000},
-       { id: 3, text: 'Book', amount:-120},
-       { id: 4, text: 'Camera', amount:15000}
-   ]
-}
+  transactions: loadInitialTransactions(),
+};
 
 // Create context
 export const GlobalContext = createContext(initialState);
@@ -18,28 +23,44 @@ export const GlobalContext = createContext(initialState);
 export const GlobalProvider = ({ children }) => {
   const [state, dispatch] = useReducer(AppReducer, initialState);
 
+  // Persist transactions to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem('transactions', JSON.stringify(state.transactions));
+    } catch (err) {
+      // ignore write errors
+    }
+  }, [state.transactions]);
+
   // Actions
   function deleteTransaction(id) {
     dispatch({
       type: 'DELETE_TRANSACTION',
-      payload: id
+      payload: id,
     });
   }
 
-   function addTransaction(transaction) {
+  function addTransaction(transaction) {
     dispatch({
       type: 'ADD_TRANSACTION',
-      payload: transaction
+      payload: transaction,
     });
+  }
+
+  function resetTransactions() {
+    try {
+      localStorage.removeItem('transactions');
+    } catch (err) {
+      // ignore
+    }
+    dispatch({ type: 'RESET_TRANSACTIONS' });
   }
 
   return (
-    <GlobalContext.Provider value={{
-      transactions: state.transactions,
-      deleteTransaction,
-      addTransaction
-      }}>
+    <GlobalContext.Provider
+      value={{ transactions: state.transactions, deleteTransaction, addTransaction, resetTransactions }}
+    >
       {children}
     </GlobalContext.Provider>
   );
-}
+};
