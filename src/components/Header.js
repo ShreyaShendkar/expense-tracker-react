@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 import { GlobalContext } from '../context/GlobalState';
 
-const Header = () => {
+export const Header = () => {
   const { resetTransactions } = useContext(GlobalContext);
 
   return (
@@ -13,5 +13,3 @@ const Header = () => {
     </div>
   )
 }
-
-export default Header
