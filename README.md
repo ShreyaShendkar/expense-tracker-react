@@ -6,7 +6,7 @@ A compact, user-friendly React application for tracking personal income and expe
 
 ## Demo
 
-- Live demo: (add your deployed URL here)
+- Live demo: https://shreyashendkar.github.io/expense-tracker-react/
 
 ---
 
